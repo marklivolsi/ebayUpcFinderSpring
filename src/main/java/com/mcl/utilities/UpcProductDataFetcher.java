@@ -1,9 +1,11 @@
-package com.mcl.models;
+package com.mcl.utilities;
 
 import com.mcl.config.PropertyKeys;
+import com.mcl.models.FindingApiRoot;
+import com.mcl.models.Item;
+import com.mcl.models.ShoppingApiRoot;
 import com.mcl.requests.Request;
 import com.mcl.requests.Response;
-import com.mcl.utilities.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,13 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class UpcProduct {
+public class UpcProductDataFetcher {
 
     private final String upc;
     private FindingApiRoot findingApiRoot;
     private Map<String, ShoppingApiRoot> itemIdResponseMap;
 
-    public UpcProduct(String upc) {
+    public UpcProductDataFetcher(String upc) {
         this.upc = upc;
         itemIdResponseMap = new HashMap<>();
     }
@@ -27,9 +29,19 @@ public class UpcProduct {
         return upc;
     }
 
-    public void fetchAllData(AsyncProcessor processor) throws ExecutionException, InterruptedException, IOException {
+    public List<Item> getItemListings() {
+        List<Item> items = new ArrayList<>();
+        for (Item item : this.getFindingApiRoot().getFindCompletedItemsResponse().get(0).getSearchResult().get(0).getItem()) {
+            items.add(item);
+        }
+        return items;
+    }
+
+    public void fetchAllItemDetails() throws ExecutionException, InterruptedException, IOException {
+        AsyncProcessor processor = new AsyncProcessor(30);
         fetchCompletedListings(processor);
         executeAllItemIdRequests(processor);
+        processor.shutdown();
         mergeAllItemDetails();
     }
 
