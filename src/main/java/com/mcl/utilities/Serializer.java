@@ -15,13 +15,13 @@ public class Serializer {
         mapper = new ObjectMapper();
     }
 
-    public String buildJsonResponse(List<Item> items, String responseCode) throws JsonProcessingException {
+    public String buildJsonResponse(List<Item> items) throws JsonProcessingException {
         String data = serializeItemListingArrayToJson(items);
-        return String.format("{\"response\":\"%s\", \"data\":%s}", responseCode, data);
+        return String.format("{\"data\":%s}", data);
     }
 
-    public String buildJsonResponse(String responseCode) {
-        return String.format("{\"response\":\"%s\", \"data\":{}}", responseCode);
+    public String buildEmptyJsonResponse() {
+        return "{\"data\":{}}";
     }
 
     private String serializeItemListingArrayToJson(List<Item> items) throws JsonProcessingException {

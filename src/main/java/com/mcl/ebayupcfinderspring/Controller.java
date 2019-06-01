@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class Controller {
 
+    @CrossOrigin
     @RequestMapping(value = "/{upc}", method = RequestMethod.GET)
     @ResponseBody
     public String fetchDataForUpc(@PathVariable String upc) {
@@ -17,16 +18,16 @@ public class Controller {
             if (new UpcStringValidator().isValid(upc)) {
                 UpcProductDataFetcher product = new UpcProductDataFetcher(upc);
                 product.fetchAllItemDetails();
-                jsonResponse = serializer.buildJsonResponse(product.getItemListings(), "200");
+                jsonResponse = serializer.buildJsonResponse(product.getItemListings());
                 return jsonResponse + "\n";
             } else {
-                jsonResponse = serializer.buildJsonResponse("404");
+                jsonResponse = serializer.buildEmptyJsonResponse();
                 return jsonResponse;
             }
         }
         catch (Exception e) {
             e.printStackTrace();
-            jsonResponse = serializer.buildJsonResponse("404");
+            jsonResponse = serializer.buildEmptyJsonResponse();
             return jsonResponse;
         }
 
